@@ -1,46 +1,24 @@
-import pymongo
-
-DB_NAME = "api"
-COLLECTION_NAME = "recipies"
-CONNECTION_STRING = "mongodb://localhost:27017" #local mongodb instance currently unsecure
-
 DATA = {
-    '_id': 2,
-    'name': 'recipe-1',
+    'name': 'testrecipe: 1',
     'description': 'test data',
     'oils': [
-        {'olive': .66},
-        {'coconut': .34}
+        {
+            'name': 'olive',
+            'ratio': .3
+        },
+        {
+            'name': 'coconut',
+            'ratio': .70
+        }
     ],
-    'liquid': 124,
-    'lye': 56.3,
-    'weight': 800
+    'liquid': None,
+    'lye': None,
+    'weight': 800,
+    'superfat': .05
 }
 
-def create():
-    client = pymongo.MongoClient(CONNECTION_STRING)
-    try:
-        client.server_info() # validate connection string
-    except pymongo.errors.ServerSelectionTimeoutError:
-        raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")
-
-    db = client[DB_NAME]
-    col = db[COLLECTION_NAME]
-    response = col.insert_one(DATA)
-    print(response.inserted_id)
-
-def delete():
-    client = pymongo.MongoClient(CONNECTION_STRING)
-    try:
-        client.server_info() # validate connection string
-    except pymongo.errors.ServerSelectionTimeoutError:
-        raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")
-
-    db = client[DB_NAME]
-    col = db[COLLECTION_NAME]
-    col.delete_many({})
-
-
-if __name__ == "__main__": 
-    create()
-    #delete()
+data2 = {
+    '_id': None, 
+    'name': 'aloe', 
+    'sapratio': 0.171
+}
