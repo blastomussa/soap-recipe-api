@@ -1,181 +1,145 @@
 import random
 import pymongo
-from fastapi import FastAPI
-from pydantic import BaseModel
+from datetime import datetime
+from fastapi import FastAPI, HTTPException
+from models import Items, Version, Oil, Recipe
+from calculate import calculate_recipe
 
 app = FastAPI()
 
-DB_NAME = "api"
 CONNECTION_STRING = "mongodb://localhost:27017" # needs to be dynamic; maybe pulled from ENV variable
 
-class Recipe(BaseModel):
-    _id: int | None = None
-    name: str
-    description: str | None = None
-    oils: list[dict]
-    liquid: float | None = None
-    lye: float | None = None
-    weight: float 
-    superfat: float
 
-
-class Oil(BaseModel):
-    _id: int | None = None
-    name: str 
-    sapratio: float
-
-
-def validateConnection(client):
+def validateMongo(client):
     try:
         client.server_info() # validate connection string
     except pymongo.errors.ServerSelectionTimeoutError:
         raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")
 
-
-def calculate_recipe(Recipe):
-    weight = Recipe['weight']
-    superfat = Recipe['superfat']
-
-    # 1:3 liquid to oil ratio
-    liquid = weight * .33
-    Recipe['liquid'] = liquid
-    client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
-
-    db = client['api']
-    col = db['oils']
-
-    # calculate individual oil weights and update dictionary
-    i = 0
-    for r in Recipe['oils']:
-        name = r['name']
-        w = r['ratio'] * weight #need to validate ratios; must total 1
-        Recipe['oils'][i]['weight'] = w
-        
-        # calculate lye weight
-        search = list(col.find({'name': name})) #need to validate if oil is found 
-        converted_weight = w - (w * superfat)
-        lye = converted_weight * search[0]['sapratio']
-        if Recipe['lye']: 
-            Recipe['lye'] = Recipe['lye'] + lye
-        else:
-            Recipe['lye'] = lye
-        i = i + 1
- 
-    return Recipe
+@app.get("/", response_model=Version)
+async def get_version():
+    version_info = {
+        'version': '0.0.1',
+        'author': 'Joe Courtney',
+        'repository': 'https://github.com/blastomussa/soap-recipe-api'
+    }
+    return version_info
 
 
-@app.get("/recipes")
+@app.get("/recipes", response_model=Items, tags=["Recipes"])
 async def get_recipes():
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
-
-    db = client[DB_NAME]
-    col = db['recipes']
+    validateMongo(client)
     items = {
         'items': [],
         'count': 0
         }
-    cursor = col.find({})
+    cursor = client.api.recipes.find({})
     for document in cursor:
         items['items'].append(document)  
         items['count'] =  int(items['count']) + 1 
     return items
 
 
-@app.post("/recipes")
+@app.post("/recipes", status_code=201, response_model=Recipe, tags=["Recipes"])
 async def create_recipe(recipe: Recipe):
     result = {**recipe.dict()}
     recipe = calculate_recipe(result)
 
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
-
-    db = client[DB_NAME]
-    col = db['recipes']
+    validateMongo(client)
 
     id = random.randint(0,1000)
-    docs = col.find({'_id': id})
+    docs = client.api.recipes.find({'_id': id})
     while len(list(docs)) != 0:
         id = random.randint(0,1000)
-        docs = col.find({'_id': id})
+        docs = client.api.recipes.find({'_id': id})
         
-    
     recipe['_id'] = id
-    col.insert_one(recipe)
+    recipe['date'] = str(datetime.today())
+    client.api.recipes.insert_one(recipe)
     return recipe
 
 
-@app.delete("/recipes/{recipe_id}")
+@app.get("/recipes/{recipe_id}", response_model=Recipe, tags=["Recipes"])
+async def get_recipe(recipe_id: int):
+    client = pymongo.MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    document = client.api.recipes.find_one({'_id': recipe_id})
+    if document: 
+        return document
+    else: 
+        raise HTTPException(status_code=404,  detail="Item not found")
+
+
+@app.delete("/recipes/{recipe_id}", response_model=Recipe, tags=["Recipes"])
 async def delete_recipe(recipe_id: int):
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
+    validateMongo(client)
 
-    db = client[DB_NAME]
-    col = db['recipes']
-
-    if len(list(col.find({'_id': recipe_id}))) == 0:
+    if len(list(client.api.recipes.find({'_id': recipe_id}))) == 0:
         return {'Error': f"A recipe with the _id: {recipe_id} was not found in the database"}
     else:
-        col.delete_one({'_id': recipe_id})
+        client.api.recipes.delete_one({'_id': recipe_id})
         return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}
     
 
 
-@app.get("/oils")
+@app.get("/oils", response_model=Items, tags=["Oils"])
 async def get_oils():
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
-
-    db = client[DB_NAME]
-    col = db['oils']
+    validateMongo(client)
     items = {
         'items': [],
         'count': 0
         }
-    cursor = col.find({})
+    cursor = client.api.oils.find({})
     for document in cursor:
         items['items'].append(document)  
         items['count'] =  int(items['count']) + 1 
     return items
 
 
-@app.post("/oils")
+@app.get("/oils/{oil_id}", response_model=Oil, tags=["Oils"])
+async def get_oil(oil_id: int):
+    client = pymongo.MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    document = client.api.oils.find_one({'_id': oil_id})
+    if document: 
+        return document
+    else: 
+        raise HTTPException(status_code=404,  detail="Item not found")
+
+
+@app.post("/oils", status_code=201, response_model=Oil, tags=["Oils"])
 async def create_oil(oil: Oil):
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
+    validateMongo(client)
     result = {**oil.dict()}
 
-    db = client[DB_NAME]
-    col = db['oils']
-
-    if len(list(col.find({'name': result['name']}))) != 0:
-        ls = list(col.find({'name': result['name']}))
+    if len(list(client.api.oils.find({'name': result['name']}))) != 0:
+        ls = list(client.api.oils.find({'name': result['name']}))
         schema = ls[0]
         return {'Error': f"{schema['name']} oil already exists in the database"}
 
     id = random.randint(0,1000)
-    docs = col.find({'_id': id})
+    docs = client.api.oils.find({'_id': id})
     while len(list(docs)) != 0:
         id = random.randint(0,1000)
-        docs = col.find({'_id': id})
+        docs = client.api.oils.find({'_id': id})
            
     result['_id'] = id
-    col.insert_one(result)
+    client.api.oils.insert_one(result)
     return result
 
 
-@app.delete("/oils/{oil_id}")
+@app.delete("/oils/{oil_id}", tags=["Oils"])
 async def delete_oil(oil_id: int):
     client = pymongo.MongoClient(CONNECTION_STRING)
-    validateConnection(client)
-
-    db = client[DB_NAME]
-    col = db['oils']
-
-    if len(list(col.find({'_id': oil_id}))) == 0:
+    validateMongo(client)
+    if len(list(client.api.oils.find({'_id': oil_id}))) == 0:
         return {'Error': f"An oil with the _id: {oil_id} was not found in the database"}
     else:
-        col.delete_one({'_id': oil_id})
+        client.api.oils.delete_one({'_id': oil_id})
         return {'Success': f"Oil _id: {oil_id} was successfully deleted"}
     
