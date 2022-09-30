@@ -6,7 +6,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 DB_NAME = "api"
-CONNECTION_STRING = "mongodb://localhost:27017"
+CONNECTION_STRING = "mongodb://localhost:27017" # needs to be dynamic; maybe pulled from ENV variable
 
 class Recipe(BaseModel):
     _id: int | None = None
