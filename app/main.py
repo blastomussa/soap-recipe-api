@@ -7,7 +7,8 @@ from calculate import calculate_recipe
 
 app = FastAPI()
 
-CONNECTION_STRING = "mongodb://localhost:27017" # needs to be dynamic; maybe pulled from ENV variable
+# use host.docker.internal for docker to access mongo on local machine
+CONNECTION_STRING = "mongodb://host.docker.internal:27017"  # needs to be dynamic; maybe pulled from ENV variable
 
 
 def validateMongo(client):

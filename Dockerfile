@@ -1,13 +1,17 @@
 FROM python:3.10.7-slim-bullseye
 
-COPY ./requirements.txt /app/requirements.txt
+# Install git
+RUN apt-get -y update
+RUN apt-get -y install git
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+# Clone github repository
+RUN git clone https://github.com/blastomussa/soap-recipe-api /API
+WORKDIR /API
 
-COPY ./app /app
+RUN pip install --no-cache-dir --upgrade -r /requirements.txt
 
 EXPOSE 80
 
-WORKDIR /app
+WORKDIR /API/app
 
 CMD python -m uvicorn main:app --host 0.0.0.0 --port 80
