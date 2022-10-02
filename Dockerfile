@@ -5,6 +5,8 @@ RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get -y install git
 
+ENV DOCKER_IMG=true
+
 # Clone github repository
 RUN git clone https://github.com/blastomussa/soap-recipe-api /API
 WORKDIR /API

@@ -1,8 +1,9 @@
 import pymongo
+from internal.validateDBConnection import validateMongo
+from internal.connectionString import CONNECTION_STRING
 
-CONNECTION_STRING = "mongodb://localhost:27017"
 
-def calculate_recipe(Recipe):
+def calculateRecipe(Recipe):
     weight = Recipe['weight']
     superfat = Recipe['superfat']
 
@@ -33,10 +34,3 @@ def calculate_recipe(Recipe):
         i = i + 1
  
     return Recipe
-
-
-def validateMongo(client):
-    try:
-        client.server_info() # validate connection string
-    except pymongo.errors.ServerSelectionTimeoutError:
-        raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")

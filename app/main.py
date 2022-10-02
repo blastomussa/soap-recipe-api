@@ -1,21 +1,18 @@
 import random
 import pymongo
 from datetime import datetime
-from fastapi import FastAPI, HTTPException
 from models import Items, Version, Oil, Recipe
-from calculate import calculate_recipe
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, HTTPException, Depends
+
+# internal modules
+from internal.calculate import calculateRecipe
+from internal.validateDBConnection import validateMongo
+from internal.connectionString  import CONNECTION_STRING
+
 
 app = FastAPI()
 
-# use host.docker.internal for docker to access mongo on local machine
-CONNECTION_STRING = "mongodb://host.docker.internal:27017"  # needs to be dynamic; maybe pulled from ENV variable
-
-
-def validateMongo(client):
-    try:
-        client.server_info() # validate connection string
-    except pymongo.errors.ServerSelectionTimeoutError:
-        raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")
 
 @app.get("/", response_model=Version)
 async def get_version():
@@ -45,7 +42,7 @@ async def get_recipes():
 @app.post("/recipes", status_code=201, response_model=Recipe, tags=["Recipes"])
 async def create_recipe(recipe: Recipe):
     result = {**recipe.dict()}
-    recipe = calculate_recipe(result)
+    recipe = calculateRecipe(result)
 
     client = pymongo.MongoClient(CONNECTION_STRING)
     validateMongo(client)
