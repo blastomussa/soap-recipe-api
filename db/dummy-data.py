@@ -22,3 +22,11 @@ data2 = {
     'name': 'aloe', 
     'sapratio': 0.171
 }
+
+admin = {
+    '_id': None,
+    'username': None,
+    'email': None,
+    'full_name': None,
+    'disabled': None,
+}

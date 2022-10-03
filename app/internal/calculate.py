@@ -1,4 +1,4 @@
-import pymongo
+from pymongo import MongoClient
 from internal.validateDBConnection import validateMongo
 from internal.connectionString import CONNECTION_STRING
 
@@ -10,7 +10,7 @@ def calculateRecipe(Recipe):
     # 1:3 liquid to oil ratio
     liquid = weight * .33
     Recipe['liquid'] = liquid
-    client = pymongo.MongoClient(CONNECTION_STRING)
+    client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
 
     db = client['api']

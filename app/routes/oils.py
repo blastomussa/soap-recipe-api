@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=Items, tags=["Oils"])
+@router.get("", response_model=Items, tags=["Oils"])
 async def get_oils():
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -41,7 +41,7 @@ async def get_oil(oil_id: int):
         raise HTTPException(status_code=404,  detail="Item not found")
 
 
-@router.post("/", status_code=201, response_model=Oil, tags=["Oils"])
+@router.post("", status_code=201, response_model=Oil, tags=["Oils"])
 async def create_oil(oil: Oil):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)

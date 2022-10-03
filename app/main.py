@@ -1,10 +1,8 @@
-from models import Version
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer # not implemented yet; for Oauth2
 
-# internal modules
-from internal.validateDBConnection import validateMongo
-from internal.connectionString  import CONNECTION_STRING
+#internal modules
+from models import Version
 
 # routes
 from routes import oils, recipes

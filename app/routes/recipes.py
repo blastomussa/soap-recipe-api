@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=Items, tags=["Recipes"])
+@router.get("", response_model=Items, tags=["Recipes"])
 async def get_recipes():
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -32,7 +32,7 @@ async def get_recipes():
     return items
 
 
-@router.post("/", status_code=201, response_model=Recipe, tags=["Recipes"])
+@router.post("", status_code=201, response_model=Recipe, tags=["Recipes"])
 async def create_recipe(recipe: Recipe):
     result = {**recipe.dict()}
     recipe = calculateRecipe(result)
