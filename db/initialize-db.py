@@ -1,5 +1,6 @@
 import requests
 import pymongo
+from random import randint
 
 URL = "http://127.0.0.1:8000/oils"
 DB_NAME = "api"
@@ -40,6 +41,16 @@ OILS = [
     {'walnut': 0.138}
 ]
 
+ID = randint(0,1000)
+ADMIN = {
+    '_id': ID,
+    'username': 'johndoe',
+    'full_name': 'John Doe',
+    'email': 'johndoe@example.com',
+    'disabled': False,
+    'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
+}
+
 def createOilsDB():
     for oil in OILS:
         k = list(oil.keys())
@@ -53,6 +64,18 @@ def createOilsDB():
         }
         response = requests.post(URL,json=oil)
         print(response.json())
+
+
+def dummyUser():
+    client = pymongo.MongoClient(CONNECTION_STRING)
+    validate(client)
+
+    db = client[DB_NAME]
+    col = db['Users'] 
+    col.insert_one(ADMIN)
+    r = col.find_one()
+    print(r)
+
 
 
 def deleteAllDocs(colName):
@@ -90,4 +113,3 @@ def validate(client):
 
 if __name__ == "__main__": 
     getCols()
-    #delete()

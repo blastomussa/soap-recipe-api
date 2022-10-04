@@ -6,9 +6,13 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
+# database 
+import pymongo
+
+
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = "c0bedecd404360ff03757f13f303e6534a6d0cdedb9c8aed4c51bf8db000a487"
+SECRET_KEY = "c0bedecd404360ff03757f13f303e6534a6d0cdedb9c8aed4c51bf8db000a487" #should be stored in env variable for non-dev
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -58,13 +62,14 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-
+# THIS NEEDS TO BE MODIFIED FOR MY USER MODEL IN MONGO <<<<<<<<<<<<----------------------------------------
 def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
         return UserInDB(**user_dict)
 
 
+# THIS NEEDS TO BE MODIFIED FOR MY USER MODEL IN MONGO <<<<<<<<<<<<----------------------------------------
 def authenticate_user(fake_db, username: str, password: str):
     user = get_user(fake_db, username)
     if not user:
@@ -99,6 +104,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
+    # THIS NEEDS TO BE MODIFIED FOR MY USER MODEL IN MONGO <<<<<<<<<<<<----------------------------------------
     user = get_user(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
