@@ -1,3 +1,4 @@
+from getpass import getuser
 import requests
 import pymongo
 from random import randint
@@ -76,6 +77,15 @@ def dummyUser():
     r = col.find_one()
     print(r)
 
+def getUsers(colName):
+    client = pymongo.MongoClient(CONNECTION_STRING)
+    validate(client)
+    db = client[DB_NAME]
+    col = db[colName]
+    cursor = col.find({})
+    for document in cursor:
+        print(document)
+
 
 
 def deleteAllDocs(colName):
@@ -112,4 +122,4 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    getCols()
+    getUsers('Users')
