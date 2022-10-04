@@ -1,4 +1,3 @@
-from getpass import getuser
 import requests
 import pymongo
 from random import randint
@@ -49,6 +48,16 @@ ADMIN = {
     'full_name': 'John Doe',
     'email': 'johndoe@example.com',
     'disabled': False,
+    'admin': True,
+    'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
+}
+USER = {
+    '_id': ID,
+    'username': 'jackdoe',
+    'full_name': 'Jack Doe',
+    'email': 'jackdoe@example.com',
+    'disabled': False,
+    'admin': False,
     'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
 }
 
@@ -73,7 +82,7 @@ def dummyUser():
 
     db = client[DB_NAME]
     col = db['Users'] 
-    col.insert_one(ADMIN)
+    col.insert_one(USER)
     r = col.find_one()
     print(r)
 
@@ -122,4 +131,5 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    getUsers('Users')
+    #dropCol('Users')
+    dummyUser()

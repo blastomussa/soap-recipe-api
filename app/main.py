@@ -1,23 +1,25 @@
 from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer # not implemented yet; for Oauth2
 
 #internal modules
 from models import Version
 
 # routes
-from routes import oils, recipes
+from routes import oils, recipes, token, me, users
 
 app = FastAPI()
 
 
 app.include_router(oils.router)
 app.include_router(recipes.router)
+app.include_router(token.router)
+app.include_router(me.router)
+app.include_router(users.router)
 
 
 @app.get("/", response_model=Version)
 async def get_version():
     version_info = {
-        'version': '0.0.1',
+        'version': '0.0.2',
         'author': 'Joe Courtney',
         'repository': 'https://github.com/blastomussa/soap-recipe-api'
     }
