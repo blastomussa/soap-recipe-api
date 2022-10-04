@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from models import Version
 
 # routes
-from routes import oils, recipes, token, me
+from routes import oils, recipes, token, me, users
 
 app = FastAPI()
 
@@ -13,6 +13,7 @@ app.include_router(oils.router)
 app.include_router(recipes.router)
 app.include_router(token.router)
 app.include_router(me.router)
+app.include_router(users.router)
 
 
 @app.get("/", response_model=Version)
