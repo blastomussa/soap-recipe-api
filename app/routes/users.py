@@ -1,6 +1,5 @@
-from pydantic import ValidationError
 from models import User, Items, Admin, NewUser
-from fastapi import APIRouter, Depends, HTTPException, status, Form
+from fastapi import APIRouter, Depends
 
 from internal.dependencies import get_current_admin_user
 
@@ -37,15 +36,13 @@ async def read_users(current_user: User = Depends(get_current_admin_user)):
 
 # WORK ON THIS
 @router.post("",status_code=201)
-async def create_user(user: NewUser):
-    try:
-        return {user.username: user.password1}
-    except ValidationError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unable to validate new user fields.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def register_user(user: NewUser):
+    return {user.username: user.password1}
+    # if username is found in DB
+
+    # if email is found in DB
+
+    # how to choose an id in a quick way without collisions 
 
 
 
