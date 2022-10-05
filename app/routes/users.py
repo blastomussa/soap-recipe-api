@@ -1,7 +1,7 @@
 from models import User, Items
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 
-from internal.dependencies import get_current_active_user, get_current_admin_user, get_password_hash
+from internal.dependencies import get_current_admin_user
 
 from pymongo import MongoClient
 from internal.validateDBConnection import validateMongo
@@ -34,10 +34,12 @@ async def read_users(current_user: User = Depends(get_current_admin_user)):
     
 
 
-# NOT DONE
+# NOT WORKING
+# HOW DO I PULL DATA FROM POST AND FORM CORRECTLY ACCORDING TO PYDANTIC MODELS?
 @router.post("",status_code=201, response_model=User)
-async def create_user():
-    pass
+async def create_user(username: str, password: str):
+    return {username: password}
+
 
 
 @router.patch("/{user_id}", status_code=201, response_model=User)

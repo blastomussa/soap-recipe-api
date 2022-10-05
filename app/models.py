@@ -22,8 +22,8 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str # additional pw fields for database user model
-    
 
+    
 # items model
 class Items(BaseModel):
     items: list[dict]
