@@ -14,7 +14,7 @@ from internal.env import ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(
     prefix="/token",
-    tags=["token"],
+    tags=["Token"],
     responses={404: {"description": "Not found"}},
 )
 

@@ -4,20 +4,21 @@ from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException
 
 # Internal modules
-from models import Items, Recipe
+from models import Items, Recipe, User
 from internal.calculate import calculateRecipe
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING
+from internal.dependencies import get_current_active_user
 
 
 router = APIRouter(
     prefix="/recipes",
-    tags=["recipes"],
+    tags=["Recipes"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.get("", response_model=Items, tags=["Recipes"])
+@router.get("", response_model=Items)
 async def get_recipes():
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -32,8 +33,8 @@ async def get_recipes():
     return items
 
 
-@router.post("", status_code=201, response_model=Recipe, tags=["Recipes"])
-async def create_recipe(recipe: Recipe):
+@router.post("", status_code=201, response_model=Recipe)
+async def create_recipe(recipe: Recipe, current_user: User = Depends(get_current_active_user)):
     result = {**recipe.dict()}
     recipe = calculateRecipe(result)
 
@@ -52,7 +53,7 @@ async def create_recipe(recipe: Recipe):
     return recipe
 
 
-@router.get("/{recipe_id}", response_model=Recipe, tags=["Recipes"])
+@router.get("/{recipe_id}", response_model=Recipe)
 async def get_recipe(recipe_id: int):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -63,8 +64,8 @@ async def get_recipe(recipe_id: int):
         raise HTTPException(status_code=404,  detail="Item not found")
 
 
-@router.delete("/{recipe_id}", response_model=Recipe, tags=["Recipes"])
-async def delete_recipe(recipe_id: int):
+@router.delete("/{recipe_id}", response_model=Recipe)
+async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current_active_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
 

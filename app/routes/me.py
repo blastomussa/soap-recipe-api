@@ -4,7 +4,7 @@ from internal.dependencies import get_current_active_user
 
 router = APIRouter(
     prefix="/users/me",
-    tags=["me"],
+    tags=["Me"],
     responses={404: {"description": "Not found"}},
 )
 

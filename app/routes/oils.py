@@ -3,19 +3,20 @@ from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException
 
 # Internal modules
-from models import Items, Oil
+from models import Items, Oil, User
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING
+from internal.dependencies import get_current_admin_user
 
 
 router = APIRouter(
     prefix="/oils",
-    tags=["oils"],
+    tags=["Oils"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.get("", response_model=Items, tags=["Oils"])
+@router.get("", response_model=Items)
 async def get_oils():
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -30,7 +31,7 @@ async def get_oils():
     return items
 
 
-@router.get("/{oil_id}", response_model=Oil, tags=["Oils"])
+@router.get("/{oil_id}", response_model=Oil)
 async def get_oil(oil_id: int):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -41,8 +42,8 @@ async def get_oil(oil_id: int):
         raise HTTPException(status_code=404,  detail="Item not found")
 
 
-@router.post("", status_code=201, response_model=Oil, tags=["Oils"])
-async def create_oil(oil: Oil):
+@router.post("", status_code=201, response_model=Oil, )
+async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     result = {**oil.dict()}
@@ -63,8 +64,8 @@ async def create_oil(oil: Oil):
     return result
 
 
-@router.delete("/{oil_id}", tags=["Oils"])
-async def delete_oil(oil_id: int):
+@router.delete("/{oil_id}")
+async def delete_oil(oil_id: int, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     if len(list(client.api.oils.find({'_id': oil_id}))) == 0:

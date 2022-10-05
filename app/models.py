@@ -34,6 +34,9 @@ class Items(BaseModel):
 class Version(BaseModel):
     version: str
     author: str
+    description: str
+    language: str
+    framework: str
     repository: str
 
 
