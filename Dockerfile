@@ -13,6 +13,4 @@ EXPOSE 80
 
 WORKDIR /API/app
 
-RUN pip freeze
-
 CMD python -m uvicorn main:app --host 0.0.0.0 --port 80
