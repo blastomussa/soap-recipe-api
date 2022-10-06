@@ -119,4 +119,3 @@ async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current
     else:
         client.api.recipes.delete_one({'_id': recipe_id})
         return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}
-    

@@ -98,14 +98,3 @@ async def toggle_user_disabled(user_id: int, disabled: Disabled, current_user: U
     update = {'$set':{'disabled': True}} if disabled.disabled else {'$set':{'admin': False}} #ternary operator
     client.api.Users.update_one(query,update)
     return client.api.Users.find_one(query)
-   
-    
-
-    
-
-
-
-
-
-
-
