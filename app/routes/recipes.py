@@ -48,6 +48,7 @@ async def create_recipe(recipe: Recipe, current_user: User = Depends(get_current
         
     recipe['_id'] = id
     recipe['date'] = str(datetime.today())
+    recipe['creator'] = current_user
     client.api.recipes.insert_one(recipe)
     return recipe
 

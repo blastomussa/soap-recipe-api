@@ -1,4 +1,4 @@
-import random
+from random import randint
 from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -40,8 +40,8 @@ async def get_oil(oil_id: int):
         return client.api.oils.find_one({'_id': oil_id})
     else: 
         raise HTTPException(
-            status_code=404,  
-            detail="Item not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"oil id: {oil_id} not found"
         )
 
 
@@ -50,16 +50,16 @@ async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admi
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     result = {**oil.dict()}
-
-    if client.api.oils.find_one({'name': result['name']}):
+    name = result['name']
+    if client.api.oils.find_one({'name': name.lower()}):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"{result['name']} oil already exists in the database"
         )
 
-    id = random.randint(0,1000)
+    id = randint(0,1000)
     while client.api.oils.find_one({'_id': id}):
-        id = random.randint(0,1000)       
+        id = randint(0,1000)       
     result['_id'] = id
 
     client.api.oils.insert_one(result)

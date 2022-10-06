@@ -2,8 +2,6 @@ from fastapi import FastAPI
 
 #internal modules
 from schema import Version
-
-# routes
 from routes import oils, recipes, token, me, users
 
 app = FastAPI()

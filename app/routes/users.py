@@ -39,6 +39,7 @@ async def read_users(current_user: User = Depends(get_current_admin_user)):
 async def register_user(user: NewUser):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
+
     if client.api.Users.find_one({'username': user.username.lower()}):
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
