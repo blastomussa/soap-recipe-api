@@ -85,6 +85,7 @@ class OilRatio(BaseModel):
 
 class OilWeight(BaseModel):
     name: str
+    ratio: float
     weight: float
 
 

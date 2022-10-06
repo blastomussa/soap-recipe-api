@@ -3,8 +3,10 @@ from datetime import datetime
 from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from fastapi.encoders import jsonable_encoder
+
 # Internal modules
-from models import Recipe
+from models import Recipe, NewRecipe
 from schema import User, Items
 from internal.calculate import calculateRecipe
 from internal.validateDBConnection import validateMongo
@@ -33,24 +35,25 @@ async def get_recipes():
         items['count'] =  int(items['count']) + 1 
     return items
 
-
+# NOT WORKING RIGHT
 @router.post("", status_code=201, response_model=Recipe)
-async def create_recipe(recipe: Recipe, current_user: User = Depends(get_current_active_user)):
+async def create_recipe(recipe: NewRecipe, current_user: User = Depends(get_current_active_user)):
     result = {**recipe.dict()}
-    recipe = calculateRecipe(result)
+    user_result = {**current_user.dict()}
+    response = calculateRecipe(result)
 
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
 
-    id = randint(0,1000)
+    id = randint(0,10000)
     while client.api.recipes.find_one({'_id': id}):
-        id = randint(0,1000)
+        id = randint(0,10000)
         
-    recipe['_id'] = id
-    recipe['date'] = str(datetime.today())
-    recipe['creator'] = current_user
-    client.api.recipes.insert_one(recipe)
-    return recipe
+    response['_id'] = id
+    response['date'] = str(datetime.today())
+    response['creator'] = current_user #<<<<<<<<<<<<<<<<<< RETURNING SENSITIVE DATA FIX THIS<<<<<<<<<<<<<<<<<<<<<<<<<<<,,
+    client.api.recipes.insert_one(jsonable_encoder(response)) #encode data because it includes a pydantic model 
+    return response
 
 
 @router.get("/{recipe_id}", response_model=Recipe)
