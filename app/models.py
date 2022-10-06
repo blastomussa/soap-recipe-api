@@ -1,11 +1,11 @@
 from re import compile, fullmatch, search
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, EmailStr, validator, root_validator
 
 
 class NewUser(BaseModel):
     username: str
     full_name: str
-    email: str | None = None
+    email: EmailStr | None = None
     password1: str
     password2: str
     
@@ -34,14 +34,6 @@ class NewUser(BaseModel):
         elif len(v) > 30 or len(v) < 5:
             raise ValueError('full name must be between 5 and 30 characters long')
         return v.title()
-
-    @validator('email')
-    def check_email(cls, v):
-        # validated based on RFC5322 specification
-        regex = compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
-        if not fullmatch(regex, v):
-            raise ValueError('Email must be valid')
-        return v.title()   
 
 
 # oil model
