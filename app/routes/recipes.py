@@ -1,7 +1,7 @@
-import random
+from random import randint
 from datetime import datetime
 from pymongo import MongoClient
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 # Internal modules
 from models import Recipe
@@ -42,11 +42,9 @@ async def create_recipe(recipe: Recipe, current_user: User = Depends(get_current
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
 
-    id = random.randint(0,1000)
-    docs = client.api.recipes.find({'_id': id})
-    while len(list(docs)) != 0:
-        id = random.randint(0,1000)
-        docs = client.api.recipes.find({'_id': id})
+    id = randint(0,1000)
+    while client.api.recipes.find_one({'_id': id}):
+        id = randint(0,1000)
         
     recipe['_id'] = id
     recipe['date'] = str(datetime.today())
@@ -58,20 +56,24 @@ async def create_recipe(recipe: Recipe, current_user: User = Depends(get_current
 async def get_recipe(recipe_id: int):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
-    document = client.api.recipes.find_one({'_id': recipe_id})
-    if document: 
-        return document
+    if client.api.recipes.find_one({'_id': recipe_id}): 
+        return client.api.recipes.find_one({'_id': recipe_id})
     else: 
-        raise HTTPException(status_code=404,  detail="Item not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"A recipe with the id: {recipe_id} was not found in the database"
+        )
 
 
 @router.delete("/{recipe_id}", response_model=Recipe)
 async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current_active_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
-
-    if len(list(client.api.recipes.find({'_id': recipe_id}))) == 0:
-        return {'Error': f"A recipe with the _id: {recipe_id} was not found in the database"}
+    if not client.api.recipes.find_one({'_id': recipe_id}):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"A recipe with the id: {recipe_id} was not found in the database"
+        )
     else:
         client.api.recipes.delete_one({'_id': recipe_id})
         return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}

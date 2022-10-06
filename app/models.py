@@ -25,7 +25,7 @@ class NewUser(BaseModel):
         regex = compile(r"^[a-zA-Z]{5,20}$")
         if not fullmatch(regex,v):
             raise ValueError('username must be must only use letters and be 5-20 characters in length')
-        return v.title()
+        return v
     
     @validator('full_name')
     def name_must_contain_space(cls, v):

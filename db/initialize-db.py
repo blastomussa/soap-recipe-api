@@ -131,5 +131,5 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    #dropCol('Users')
-    dummyUser()
+    dropCol('User')
+    #dummyUser()

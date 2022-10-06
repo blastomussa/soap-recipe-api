@@ -1,8 +1,10 @@
-from schema import User, Items, Admin
+from random import randint
+from schema import User, Items, Admin, UserInDB
 from models import NewUser
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from internal.dependencies import get_current_admin_user
+from internal.dependencies import get_password_hash
 
 from pymongo import MongoClient
 from internal.validateDBConnection import validateMongo
@@ -30,21 +32,40 @@ async def read_users(current_user: User = Depends(get_current_admin_user)):
     for document in cursor:
         items['items'].append(document)  
         items['count'] =  int(items['count']) + 1 
-    return items
-
-    
+    return items    
 
 
-# WORK ON THIS
-@router.post("",status_code=201)
+@router.post("",status_code=201, response_model=UserInDB)
 async def register_user(user: NewUser):
-    return {user.username: user.password1}
-    # if username is found in DB
+    client = MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    if client.api.Users.find_one({'username': user.username.lower()}):
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Username already in use"
+        )
+    elif client.api.Users.find_one({'email': user.email.lower()}):
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Email already in use"
+        )
 
-    # if email is found in DB
+    id = randint(0,1000)
+    while client.api.User.find_one({'_id': id}):
+        id = randint(0,1000)
 
-    # how to choose an id in a quick way without collisions 
-
+    new_db_user = {
+        'username': user.username.lower(),
+        'email': user.email.lower(),
+        'full_name': user.full_name,
+        'disabled': False,
+        'admin': False,
+        'hashed_password': get_password_hash(user.password1),
+        '_id': id,
+    }
+    
+    client.api.Users.insert_one(new_db_user)
+    return new_db_user
 
 
 @router.patch("/{user_id}", status_code=201, response_model=User)
@@ -52,6 +73,11 @@ async def toggle_user_admin(user_id: int, admin: Admin, current_user: User = Dep
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     query = {'_id': user_id}
+    if not client.api.Users.find_one(query):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id: {user_id} not found"
+        )
     update = {'$set':{'admin': True}} if admin.admin else {'$set':{'admin': False}} #ternary operator
     client.api.Users.update_one(query,update)
     return client.api.Users.find_one(query)
