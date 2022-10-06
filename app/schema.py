@@ -26,7 +26,10 @@ class UserInDB(User):
 
 
 class Admin(BaseModel):
-    admin: bool 
+    admin: bool
+
+class Disabled(BaseModel):
+    disabled: bool
 
 
 # items model

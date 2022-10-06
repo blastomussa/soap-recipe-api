@@ -87,6 +87,7 @@ class OilWeight(BaseModel):
     weight: float
 
 
+# ADD VALIDATORS FOR OILS<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 class NewRecipe(BaseModel):
     name: str
     description: str | None = None

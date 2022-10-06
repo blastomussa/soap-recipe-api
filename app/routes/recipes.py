@@ -87,7 +87,8 @@ async def get_recipe(recipe_id: int):
         )
 
 
-@router.delete("/{recipe_id}", response_model=Recipe)
+# delete recipe; only allowed if admin or recipe is associated with user
+@router.delete("/{recipe_id}")
 async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current_active_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -96,6 +97,25 @@ async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current
             status_code=status.HTTP_404_NOT_FOUND, 
             detail=f"A recipe with the id: {recipe_id} was not found in the database"
         )
+    elif not current_user.admin:
+        if current_user.recipes:
+            found = False
+            for r in current_user.recipes:
+                if r == recipe_id:
+                    found = True
+                    client.api.recipes.delete_one({'_id': recipe_id})
+                    return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}
+            if not found:
+                raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail=f"A recipe with the id: {recipe_id} is not associated with non-admin user"
+                ) 
+        else:
+           raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=f"A recipe with the id: {recipe_id} is not associated with non-admin user"
+            ) 
+
     else:
         client.api.recipes.delete_one({'_id': recipe_id})
         return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}

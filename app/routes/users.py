@@ -1,5 +1,5 @@
 from random import randint
-from schema import User, Items, Admin, UserInDB
+from schema import User, Items, Admin, UserInDB, Disabled
 from models import NewUser
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -81,6 +81,21 @@ async def toggle_user_admin(user_id: int, admin: Admin, current_user: User = Dep
             detail=f"User with id: {user_id} not found"
         )
     update = {'$set':{'admin': True}} if admin.admin else {'$set':{'admin': False}} #ternary operator
+    client.api.Users.update_one(query,update)
+    return client.api.Users.find_one(query)
+
+
+@router.patch("/{user_id}/disabled", status_code=201, response_model=User)
+async def toggle_user_disabled(user_id: int, disabled: Disabled, current_user: User = Depends(get_current_admin_user)):
+    client = MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    query = {'_id': user_id}
+    if not client.api.Users.find_one(query):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id: {user_id} not found"
+        )
+    update = {'$set':{'disabled': True}} if disabled.disabled else {'$set':{'admin': False}} #ternary operator
     client.api.Users.update_one(query,update)
     return client.api.Users.find_one(query)
    
