@@ -62,6 +62,7 @@ async def register_user(user: NewUser):
         'disabled': False,
         'admin': False,
         'hashed_password': get_password_hash(user.password1),
+        'recipes': [],
         '_id': id,
     }
     

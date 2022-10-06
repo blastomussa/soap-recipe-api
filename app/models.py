@@ -1,8 +1,6 @@
 from re import compile, fullmatch, search
 from pydantic import BaseModel, EmailStr, validator, root_validator
 
-from schema import User
-
 from pymongo import MongoClient
 from internal.validateDBConnection import validateMongo
 from internal.connectionString import CONNECTION_STRING
@@ -109,6 +107,11 @@ class NewRecipe(BaseModel):
         return v
 
 
+class Creator(BaseModel):
+    username: str
+    full_name: str
+
+
 class Recipe(BaseModel):
     _id: int | None = None
     name: str
@@ -119,4 +122,4 @@ class Recipe(BaseModel):
     lye: float | None = None
     weight: float 
     superfat: float
-    creator: User
+    creator: Creator

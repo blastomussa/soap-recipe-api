@@ -17,7 +17,8 @@ class User(BaseModel):
     email: str | None = None
     full_name: str | None = None
     disabled: bool | None = None
-    admin: bool | None = None 
+    admin: bool | None = None
+    recipes: list[int] | None = None
 
 
 class UserInDB(User):

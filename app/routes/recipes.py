@@ -35,11 +35,10 @@ async def get_recipes():
         items['count'] =  int(items['count']) + 1 
     return items
 
-# NOT WORKING RIGHT
+
 @router.post("", status_code=201, response_model=Recipe)
 async def create_recipe(recipe: NewRecipe, current_user: User = Depends(get_current_active_user)):
     result = {**recipe.dict()}
-    user_result = {**current_user.dict()}
     response = calculateRecipe(result)
 
     client = MongoClient(CONNECTION_STRING)
@@ -51,7 +50,26 @@ async def create_recipe(recipe: NewRecipe, current_user: User = Depends(get_curr
         
     response['_id'] = id
     response['date'] = str(datetime.today())
-    response['creator'] = current_user #<<<<<<<<<<<<<<<<<< RETURNING SENSITIVE DATA FIX THIS<<<<<<<<<<<<<<<<<<<<<<<<<<<,,
+    creator = {
+        'username': current_user.username,
+        'full_name': current_user.full_name
+    }
+    response['creator'] = creator 
+
+    # insert recipe ID into User document
+    query = {'username': current_user.username}
+    user = client.api.Users.find_one(query)
+    try:
+        if not user['recipes']:
+            user['recipes'] = []
+        user['recipes'].append(id)
+        insert = user['recipes']
+    except KeyError:
+        user['recipes'] = [id]
+        insert = user['recipes']
+    update = {'$set':{'recipes': insert}}
+    client.api.Users.update_one(query,update)
+
     client.api.recipes.insert_one(jsonable_encoder(response)) #encode data because it includes a pydantic model 
     return response
 
