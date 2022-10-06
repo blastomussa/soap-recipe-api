@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 #internal modules
-from models import Version
+from schema import Version
 
 # routes
 from routes import oils, recipes, token, me, users

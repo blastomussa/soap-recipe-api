@@ -6,10 +6,10 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from internal.dependencies import authenticate_user, create_access_token
 
 # models
-from models import Token
+from schema import Token
 
 # environment variable
-from internal.env import ACCESS_TOKEN_EXPIRE_MINUTES
+from config import settings
 
 
 router = APIRouter(
@@ -28,7 +28,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )

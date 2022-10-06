@@ -4,7 +4,8 @@ from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException
 
 # Internal modules
-from models import Items, Recipe, User
+from models import Recipe
+from schema import User, Items
 from internal.calculate import calculateRecipe
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING

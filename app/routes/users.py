@@ -1,4 +1,5 @@
-from models import User, Items, Admin, NewUser
+from schema import User, Items, Admin
+from models import NewUser
 from fastapi import APIRouter, Depends
 
 from internal.dependencies import get_current_admin_user
