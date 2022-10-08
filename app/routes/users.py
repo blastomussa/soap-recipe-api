@@ -42,12 +42,12 @@ async def register_user(user: NewUser):
 
     if client.api.Users.find_one({'username': user.username.lower()}):
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Username already in use"
         )
     elif client.api.Users.find_one({'email': user.email.lower()}):
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Email already in use"
         )
 

@@ -39,15 +39,30 @@ async def get_recipes():
 @router.post("", status_code=201, response_model=Recipe)
 async def create_recipe(recipe: NewRecipe, current_user: User = Depends(get_current_active_user)):
     result = {**recipe.dict()}
-    response = calculateRecipe(result)
 
+    # calculate recipe and validate response
+    response = calculateRecipe(result)
+    if 'oil not found' in response:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail=response
+        )
+
+    if 'must equal 1' in response:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=response
+        )
+        
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
 
+    # choose id for new recipe
     id = randint(0,10000)
     while client.api.recipes.find_one({'_id': id}):
         id = randint(0,10000)
         
+    #construct recipe dictionary for return
     response['_id'] = id
     response['date'] = str(datetime.today())
     creator = {

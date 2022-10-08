@@ -17,17 +17,26 @@ def calculateRecipe(Recipe):
     validateMongo(client)
 
     # calculate individual oil weights and update dictionary
-    i = 0
+    index = 0
+    total_ratio = 0
     for r in Recipe['oils']:
+        total_ratio = total_ratio + r['ratio']
         name = r['name']
-        w = r['ratio'] * weight #need to validate ratios; must total 1
-        Recipe['oils'][i]['weight'] = w
+        w = r['ratio'] * weight
+        Recipe['oils'][index]['weight'] = w
         
         # calculate lye weight
-        oil = client.api.oils.find_one({'name': name}) #need to validate if oil is found 
-        converted_weight = w - (w * superfat)
-        lye = converted_weight * oil['sapratio'] 
-        Recipe['lye'] = Recipe['lye'] + lye
-        i = i + 1
+        if client.api.oils.find_one({'name': name}): #validate if oil is found in DB
+            oil = client.api.oils.find_one({'name': name})
+            converted_weight = w - (w * superfat)
+            l = converted_weight * oil['sapratio'] 
+            lye = round(l,2)
+            Recipe['lye'] = Recipe['lye'] + lye
+            i = i + 1
+        else:
+            return f'{name} oil not found.'
+
+    if total_ratio != 1.0:
+            return "Ratio of oils must equal 1"   # total ratio must equal 1
      
     return Recipe
