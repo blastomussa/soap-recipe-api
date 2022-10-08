@@ -103,7 +103,18 @@ async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current
             for r in current_user.recipes:
                 if r == recipe_id:
                     found = True
-                    client.api.recipes.delete_one({'_id': recipe_id})
+                    deleted_recipe = client.api.recipes.find_one_and_delete({'_id': recipe_id})
+                    
+                    #search for creator to remove entry from their associated recipies list
+                    username = deleted_recipe['creator']['username']
+                    creator = client.api.Users.find_one({'username': username})
+
+                    recipes_list = creator['recipes']
+                    for i in recipes_list:
+                        if i == recipe_id:
+                            recipes_list.remove[i]
+                    client.api.Users.update_one({'username': username},{'recipes':recipes_list})
+
                     return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}
             if not found:
                 raise HTTPException(
