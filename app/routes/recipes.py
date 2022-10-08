@@ -110,11 +110,14 @@ async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current
                     creator = client.api.Users.find_one({'username': username})
 
                     recipes_list = creator['recipes']
-                    for i in recipes_list:
-                        if i == recipe_id:
-                            recipes_list.remove[i]
-                    client.api.Users.update_one({'username': username},{'recipes':recipes_list})
-
+                    try:
+                        for i in recipes_list:
+                            if i == recipe_id:
+                                recipes_list.remove[i]
+                        client.api.Users.update_one({'username': username},{'recipes':recipes_list})
+                    except TypeError:
+                        pass
+                    
                     return {'Success': f"recipe _id: {recipe_id} was successfully deleted"}
             if not found:
                 raise HTTPException(
