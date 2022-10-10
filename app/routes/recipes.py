@@ -36,7 +36,7 @@ async def get_recipes():
     return items
 
 
-@router.post("", status_code=201, response_model=Recipe)
+@router.post("", status_code=201)   # reponse model was giving validation error with oilwieght class, test different options 
 async def create_recipe(recipe: NewRecipe, current_user: User = Depends(get_current_active_user)):
     result = {**recipe.dict()}
 

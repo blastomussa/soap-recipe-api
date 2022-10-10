@@ -32,7 +32,6 @@ def calculateRecipe(Recipe):
             l = converted_weight * oil['sapratio'] 
             lye = round(l,2)
             Recipe['lye'] = Recipe['lye'] + lye
-            i = i + 1
         else:
             return f'{name} oil not found.'
 

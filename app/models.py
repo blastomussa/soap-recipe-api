@@ -118,7 +118,7 @@ class Recipe(BaseModel):
     name: str
     description: str | None = None
     date: str | None = None
-    oils: list[OilWeight]           # HOW DO I VALIDATE DATA IN THE DICTS; for each validator? or elsewhere in app
+    oils: list[dict]           # HOW DO I VALIDATE DATA IN THE DICTS; for each validator? or elsewhere in app OilWieght model
     liquid: float | None = None
     lye: float | None = None
     weight: float 

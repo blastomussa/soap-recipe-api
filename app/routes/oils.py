@@ -45,7 +45,7 @@ async def get_oil(oil_id: int):
         )
 
 
-@router.post("", status_code=201, response_model=Oil, )
+@router.post("", status_code=201, response_model=Oil)
 async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
