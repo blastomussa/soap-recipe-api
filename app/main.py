@@ -4,7 +4,22 @@ from fastapi import FastAPI
 from schema import Version
 from routes import oils, recipes, token, me, users
 
-app = FastAPI()
+description = """
+Calculates and stores soap recipes
+"""
+
+app = FastAPI(
+    title="Soap Recipe Calculator API",
+    description=description,
+    version="0.0.2",
+    contact={
+        "name": "Joe Courtney",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://mit-license.org",
+    },
+)
 
 
 app.include_router(oils.router)
