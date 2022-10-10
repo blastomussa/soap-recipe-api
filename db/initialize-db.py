@@ -42,38 +42,35 @@ OILS = [
 ]
 
 ID = randint(0,1000)
-ADMIN = {
+
+USER = {
     '_id': ID,
-    'username': 'johndoe',
-    'full_name': 'John Doe',
-    'email': 'johndoe@example.com',
+    'username': 'joedoe',
+    'full_name': 'Joe Doe',
+    'email': 'joedoe@example.com',
     'disabled': False,
     'admin': True,
     'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
 }
-USER = {
-    '_id': ID,
-    'username': 'jackdoe',
-    'full_name': 'Jack Doe',
-    'email': 'jackdoe@example.com',
-    'disabled': False,
-    'admin': False,
-    'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
-}
 
 def createOilsDB():
+    client = pymongo.MongoClient(CONNECTION_STRING)
+    validate(client)
+    db = client[DB_NAME]
+    col = db['oils']
+    i = 1
     for oil in OILS:
         k = list(oil.keys())
         v = list(oil.values())
         name = str(k[0])
         sapratio = float(v[0])
-        oil = {
-            '_id': None, 
+        new_oil = {
+            '_id': i, 
             'name': name, 
             'sapratio': sapratio
         }
-        response = requests.post(URL,json=oil)
-        print(response.json())
+        col.insert_one(new_oil)
+        i = i + 1       
 
 
 def dummyUser():
@@ -94,7 +91,6 @@ def getUsers(colName):
     cursor = col.find({})
     for document in cursor:
         print(document)
-
 
 
 def deleteAllDocs(colName):
@@ -131,5 +127,6 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    dropCol('User')
-    #dummyUser()
+    dropCol('Users')
+    dummyUser()
+    #createOilsDB()

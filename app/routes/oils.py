@@ -45,13 +45,14 @@ async def get_oil(oil_id: int):
         )
 
 
-@router.post("", status_code=201, response_model=Oil)
+@router.post("", status_code=201)
 async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     result = {**oil.dict()}
     name = result['name']
-    if client.api.oils.find_one({'name': name.lower()}):
+    result['name'] = name.lower()
+    if client.api.oils.find_one({'name': result['name']}):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"{result['name']} oil already exists in the database"
