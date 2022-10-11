@@ -1,5 +1,4 @@
 import pymongo
-from random import randint
 
 URL = "http://127.0.0.1:8000/oils"
 DB_NAME = "api"
@@ -40,10 +39,8 @@ OILS = [
     {'walnut': 0.138}
 ]
 
-ID = randint(0,1000)
-
 USER = {
-    '_id': ID,
+    '_id': 1,
     'username': 'joedoe',
     'full_name': 'Joe Doe',
     'email': 'joedoe@example.com',

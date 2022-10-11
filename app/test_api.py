@@ -58,6 +58,16 @@ def test_read_recipes():
     assert response.status_code == 200
 
 
+def test_read_users():
+    response = client.get("/users", headers=get_auth_header())
+    assert response.status_code == 200
+
+
+def test_read_user():
+    response = client.get("/users/0", headers=get_auth_header()) #test users create at _id: 0 in pytest conguration phase
+    assert response.status_code == 200
+
+
 def test_get_token():
     mp_encoder = MultipartEncoder(
             fields={
@@ -74,7 +84,7 @@ def test_me():
     assert response.status_code == 200
 
 
-def test_recipe():
+def test_recipe_endpoints():
     DATA = {
         'name': 'testrecipe: 1',
         'description': 'test data',
@@ -98,11 +108,14 @@ def test_recipe():
     response_json = response.json()
     id = response_json['_id']
 
+    response = client.get(f"{BASE_URL}/recipes/{id}", headers=get_auth_header())
+    assert response.status_code == 200
+
     response = client.delete(f"/recipes/{id}", headers=get_auth_header(),)
     assert response.status_code == 204
 
 
-def test_oils():
+def test_oils_endpoints():
     DATA = {
         'name': 'testoil',
         'sapratio': 0.123
@@ -114,11 +127,14 @@ def test_oils():
     response_json = response.json()
     id = response_json['_id']
 
+    response = client.get(f"{BASE_URL}/oils/{id}", headers=get_auth_header())
+    assert response.status_code == 200
+
     response = client.delete(f"/oils/{id}", headers=get_auth_header(),)
     assert response.status_code == 204
 
 
-def test_user():
+def test_user_endpoints():
     DATA = {
         'username': 'apitestuser',
         'full_name': 'api test',

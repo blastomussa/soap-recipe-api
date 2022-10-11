@@ -18,7 +18,7 @@ from schema import UserInDB, User, TokenData
 # import .env file settings
 from config import settings
 
-
+# hash context = bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

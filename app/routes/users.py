@@ -32,7 +32,20 @@ async def read_users(current_user: User = Depends(get_current_admin_user)):
     for document in cursor:
         items['items'].append(document)  
         items['count'] =  int(items['count']) + 1 
-    return items    
+    return items  
+
+
+@router.get("/{user_id}",status_code=200)
+async def get_user(user_id: int,current_user: User = Depends(get_current_active_user)):
+    client = MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    if client.api.Users.find_one({'_id': user_id}):
+        return client.api.Users.find_one({'_id': user_id})
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id: {user_id} not found"
+        )  
 
 
 @router.post("",status_code=201, response_model=UserInDB)
@@ -87,7 +100,7 @@ async def delete_user(user_id: int,current_user: User = Depends(get_current_acti
             )
 
 
-@router.patch("/{user_id}", status_code=201, response_model=User)
+@router.patch("/{user_id}/admin", status_code=201, response_model=User)
 async def toggle_user_admin(user_id: int, admin: Admin, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
