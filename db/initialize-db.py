@@ -1,4 +1,3 @@
-import requests
 import pymongo
 from random import randint
 
@@ -50,8 +49,10 @@ USER = {
     'email': 'joedoe@example.com',
     'disabled': False,
     'admin': True,
+    'recipes': [],
     'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
 }
+
 
 def createOilsDB():
     client = pymongo.MongoClient(CONNECTION_STRING)
@@ -82,6 +83,7 @@ def dummyUser():
     col.insert_one(USER)
     r = col.find_one()
     print(r)
+
 
 def getUsers(colName):
     client = pymongo.MongoClient(CONNECTION_STRING)
@@ -125,8 +127,8 @@ def validate(client):
         raise TimeoutError("Invalid API for MongoDB connection string or timed out when attempting to connect")
 
 
-
 if __name__ == "__main__": 
     dropCol('Users')
     dummyUser()
-    #createOilsDB()
+    dropCol('oils')
+    createOilsDB()

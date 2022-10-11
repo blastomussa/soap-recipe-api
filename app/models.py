@@ -1,5 +1,5 @@
 from re import compile, fullmatch, search
-from pydantic import BaseModel, EmailStr, validator, root_validator
+from pydantic import BaseModel, EmailStr, validator, root_validator, Field
 
 from pymongo import MongoClient
 from internal.validateDBConnection import validateMongo
@@ -41,8 +41,13 @@ class NewUser(BaseModel):
 
 
 # oil model
-class Oil(BaseModel):
-    _id: int | None = None
+class OilInDB(BaseModel):
+    id: int | None = Field(..., alias='_id')
+    name: str 
+    sapratio: float
+
+
+class NewOil(BaseModel):
     name: str 
     sapratio: float
 
@@ -114,7 +119,7 @@ class Creator(BaseModel):
 
 
 class Recipe(BaseModel):
-    _id: int | None = None
+    id: int | None = Field(..., alias='_id')
     name: str
     description: str | None = None
     date: str | None = None

@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException, status
 
 # Internal modules
-from models import Oil
+from models import NewOil, OilInDB
 from schema import User, Items
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING
@@ -32,7 +32,7 @@ async def get_oils():
     return items
 
 
-@router.get("/{oil_id}", response_model=Oil)
+@router.get("/{oil_id}", response_model=OilInDB)
 async def get_oil(oil_id: int):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
@@ -45,8 +45,8 @@ async def get_oil(oil_id: int):
         )
 
 
-@router.post("", status_code=201)
-async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admin_user)):
+@router.post("", status_code=201, response_model=OilInDB)
+async def create_new_oil(oil: NewOil, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     result = {**oil.dict()}
@@ -67,16 +67,14 @@ async def create_new_oil(oil: Oil, current_user: User = Depends(get_current_admi
     return result
 
 
-@router.delete("/{oil_id}")
+@router.delete("/{oil_id}", status_code=204)
 async def delete_oil(oil_id: int, current_user: User = Depends(get_current_admin_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
-    if not client.api.oils.find_one({'_id': oil_id}):
+    if client.api.oils.find_one({'_id': oil_id}):
+        client.api.oils.delete_one({'_id': oil_id})
+    else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"An oil with the _id: {oil_id} was not found in the database"
         )
-    else:
-        client.api.oils.delete_one({'_id': oil_id})
-        return {'Success': f"Oil _id: {oil_id} was successfully deleted"}
-    

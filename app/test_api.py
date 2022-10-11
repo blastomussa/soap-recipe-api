@@ -13,6 +13,7 @@ client = TestClient(app)
 
 BASE_URL = "http://127.0.0.1"
 
+# TEST ADMIN CREATED AND DELETED IN CONFTEST.PY WITH PYMONGO
 TEST_USER = 'johndoe'
 TEST_PW = 'secret'
 
@@ -98,7 +99,7 @@ def test_recipe():
     id = response_json['_id']
 
     response = client.delete(f"/recipes/{id}", headers=get_auth_header(),)
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 def test_oils():
@@ -114,4 +115,24 @@ def test_oils():
     id = response_json['_id']
 
     response = client.delete(f"/oils/{id}", headers=get_auth_header(),)
-    assert response.status_code == 200
+    assert response.status_code == 204
+
+
+def test_user():
+    DATA = {
+        'username': 'apitestuser',
+        'full_name': 'api test',
+        'email': 'apitest@example.com',
+        'password1': 'Supersecret2!',
+        'password2': 'Supersecret2!'
+    }
+
+    response = post(f"{BASE_URL}/users", headers=get_auth_header(), json=DATA)
+    assert response.status_code == 201
+    
+    response_json = response.json()
+    id = response_json['_id']
+
+    response = client.delete(f"/users/{id}", headers=get_auth_header())
+    assert response.status_code == 204
+

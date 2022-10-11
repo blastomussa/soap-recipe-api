@@ -3,7 +3,7 @@ from schema import User, Items, Admin, UserInDB, Disabled
 from models import NewUser
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from internal.dependencies import get_current_admin_user
+from internal.dependencies import get_current_admin_user, get_current_active_user
 from internal.dependencies import get_password_hash
 
 from pymongo import MongoClient
@@ -68,6 +68,23 @@ async def register_user(user: NewUser):
     
     client.api.Users.insert_one(new_db_user)
     return new_db_user
+
+
+@router.delete("/{user_id}",status_code=204)
+async def delete_user(user_id: int,current_user: User = Depends(get_current_active_user)):
+    client = MongoClient(CONNECTION_STRING)
+    validateMongo(client)
+    if current_user.admin:
+        client.api.Users.delete_one({'_id': user_id})
+    else:
+        user = client.api.Users.find_one({'username': current_user.username})
+        if user['_id'] == user_id:
+            client.api.Users.delete_one({'_id': user_id})
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Only admins can delete users unless deleting your own user"
+            )
 
 
 @router.patch("/{user_id}", status_code=201, response_model=User)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # token schema
 class Token(BaseModel):
@@ -12,7 +12,7 @@ class TokenData(BaseModel):
 
 # user schema
 class User(BaseModel):
-    _id: int | None = None
+    id: int | None = Field(..., alias='_id')
     username: str
     email: str | None = None
     full_name: str | None = None

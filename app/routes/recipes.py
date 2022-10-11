@@ -103,7 +103,7 @@ async def get_recipe(recipe_id: int):
 
 
 # delete recipe; only allowed if admin or recipe is associated with user
-@router.delete("/{recipe_id}")
+@router.delete("/{recipe_id}", status_code=204)
 async def delete_recipe(recipe_id: int, current_user: User = Depends(get_current_active_user)):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
