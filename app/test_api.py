@@ -1,5 +1,4 @@
 # to be used with pytest
-# pytest -rP
 from fastapi.testclient import TestClient
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from requests import post
@@ -157,3 +156,11 @@ def test_user_endpoints():
     response = client.delete(f"/users/{id}", headers=get_auth_header())
     assert response.status_code == 204
 
+# need to add tests for
+# 1. toggle admin
+# 2. toggle disabled
+# 3. update user
+# 4. change user password 
+# 5. failed status assertations
+# 6. recipe calculations
+# 7. unitest?

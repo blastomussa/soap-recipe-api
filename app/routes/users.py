@@ -1,8 +1,6 @@
 from random import randint
-import re
 
-from schema import User, Items, Admin, Disabled
-from models import NewUser
+from models import NewUser, User, Items, Admin, Disabled
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 

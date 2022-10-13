@@ -47,7 +47,7 @@ USER = {
     'disabled': False,
     'admin': True,
     'recipes': [],
-    'hashed_password': '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'
+    'hashed_password': '$2b$12$ikTsQFrXrnUjjYOihLkJjuqviWwHTMy25lT5xgiUjSdV41owR3Qve'
 }
 
 
@@ -124,8 +124,9 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    dropCol('recipes')
+    '''dropCol('recipes')
     dropCol('Users')
     dummyUser()
     dropCol('oils')
-    createOilsDB()
+    createOilsDB()'''
+    getUsers('Users')

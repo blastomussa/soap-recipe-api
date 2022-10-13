@@ -13,7 +13,7 @@ from internal.validateDBConnection import validateMongo
 from internal.connectionString import CONNECTION_STRING
 
 # models
-from schema import UserInDB, User, TokenData
+from models import UserInDB, User, TokenData
 
 # import .env file settings
 from config import settings
@@ -38,7 +38,7 @@ def get_user(username: str):
     validateMongo(client)
     user_dict = client.api.Users.find_one({'username': username}) #database = api, collection = Users
     if user_dict:
-        return UserInDB(**user_dict) #returns None if not found
+        return UserInDB(**user_dict)
     
 
 def authenticate_user(username: str, password: str):

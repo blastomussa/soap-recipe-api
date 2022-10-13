@@ -6,8 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 # Internal modules
-from models import Recipe, NewRecipe
-from schema import User, Items
+from models import Recipe, NewRecipe, User, Items
 from internal.calculate import calculateRecipe
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING

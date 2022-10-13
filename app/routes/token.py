@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from internal.dependencies import authenticate_user, create_access_token
 
 # models
-from schema import Token
+from models import Token
 
 # environment variable
 from config import settings

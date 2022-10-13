@@ -3,8 +3,7 @@ from pymongo import MongoClient
 from fastapi import APIRouter, Depends, HTTPException, status
 
 # Internal modules
-from models import NewOil, OilInDB
-from schema import User, Items
+from models import NewOil, OilInDB, User, Items
 from internal.validateDBConnection import validateMongo
 from internal.connectionString  import CONNECTION_STRING
 from internal.dependencies import get_current_admin_user
