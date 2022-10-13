@@ -107,7 +107,6 @@ def dropCol(colName):
     db = client[DB_NAME]
     col = db[colName]
     col.drop()
-    print(db.list_collection_names())
 
 
 def getCols():
@@ -125,6 +124,7 @@ def validate(client):
 
 
 if __name__ == "__main__": 
+    dropCol('recipes')
     dropCol('Users')
     dummyUser()
     dropCol('oils')

@@ -101,16 +101,18 @@ def test_recipe_endpoints():
         'weight': 800,
         'superfat': .05
     }
-
+    # POST
     response = post(f"{BASE_URL}/recipes", headers=get_auth_header(), json=DATA)
     assert response.status_code == 201
     
     response_json = response.json()
     id = response_json['_id']
 
+    # GET
     response = client.get(f"{BASE_URL}/recipes/{id}", headers=get_auth_header())
     assert response.status_code == 200
 
+    # DELETE
     response = client.delete(f"/recipes/{id}", headers=get_auth_header(),)
     assert response.status_code == 204
 
@@ -120,16 +122,18 @@ def test_oils_endpoints():
         'name': 'testoil',
         'sapratio': 0.123
     }
-
+    # POST
     response = post(f"{BASE_URL}/oils", headers=get_auth_header(), json=DATA)
     assert response.status_code == 201
     
     response_json = response.json()
     id = response_json['_id']
 
+    # GET
     response = client.get(f"{BASE_URL}/oils/{id}", headers=get_auth_header())
     assert response.status_code == 200
 
+    # DELETE
     response = client.delete(f"/oils/{id}", headers=get_auth_header(),)
     assert response.status_code == 204
 
@@ -142,13 +146,14 @@ def test_user_endpoints():
         'password1': 'Supersecret2!',
         'password2': 'Supersecret2!'
     }
-
+    # POST
     response = post(f"{BASE_URL}/users", headers=get_auth_header(), json=DATA)
     assert response.status_code == 201
     
     response_json = response.json()
     id = response_json['_id']
-
+    
+    # DELETE
     response = client.delete(f"/users/{id}", headers=get_auth_header())
     assert response.status_code == 204
 

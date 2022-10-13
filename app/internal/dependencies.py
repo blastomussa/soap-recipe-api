@@ -37,7 +37,8 @@ def get_user(username: str):
     client = MongoClient(CONNECTION_STRING)
     validateMongo(client)
     user_dict = client.api.Users.find_one({'username': username}) #database = api, collection = Users
-    return UserInDB(**user_dict) #returns None if not found
+    if user_dict:
+        return UserInDB(**user_dict) #returns None if not found
     
 
 def authenticate_user(username: str, password: str):
