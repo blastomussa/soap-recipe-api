@@ -1,8 +1,9 @@
 import pymongo
+from config import settings
 
 URL = "http://127.0.0.1:8000/oils"
 DB_NAME = "api"
-CONNECTION_STRING = "mongodb://localhost:27017"
+CONNECTION_STRING = settings.atlas_connection_string
 
 OILS = [
     {'aloe': 0.171}, 
@@ -124,9 +125,8 @@ def validate(client):
 
 
 if __name__ == "__main__": 
-    '''dropCol('recipes')
+    #dropCol('recipes')
     dropCol('Users')
-    dummyUser()
-    dropCol('oils')
-    createOilsDB()'''
-    getUsers('Users')
+    #dummyUser()
+    #dropCol('oils')
+    #createOilsDB()
