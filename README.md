@@ -27,6 +27,7 @@ vim .env
 ```
 SECRET_KEY = "***********" # result of openssl rand -hex 32 command
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ALGORITHM = "HS256"
 LOCAL_CONNECTION_STRING = "mongodb://127.0.0.1:27017" #for development on local instance of MongoDB
 ATLAS_CONNECTION_STRING = "mongodb+srv://*******.mongodb.net/?retryWrites=true&w=majority" #from MongoDB Atlas Console
 ```
