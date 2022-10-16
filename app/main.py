@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from fastapi.middleware.cors import CORSMiddleware
+
 #internal modules
 from models import Version
 from routes import oils, recipes, token, me, users
@@ -19,6 +21,19 @@ app = FastAPI(
         "name": "MIT",
         "url": "https://mit-license.org",
     },
+)
+
+# CORS: https://fastapi.tiangolo.com/tutorial/cors/
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
