@@ -4,9 +4,8 @@ from datetime import timedelta, datetime
 from passlib.context import CryptContext
 
 # fastapi
-from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status, Cookie, Response
 
 # database
 from pymongo import MongoClient
@@ -73,7 +72,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), refresh_token: str | None = Cookie(default=None)):
+async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -87,21 +86,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), refresh_token: s
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
-        try: # check for refresh token in cookie; need to 
-            if refresh_token:
-                payload = jwt.decode(refresh_token, settings.secret_key, algorithms=[settings.algorithm])
-                username: str = payload.get("sub") 
-            if username is None:
-                raise credentials_exception
-
-            access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-            access_token = create_access_token(
-                data={"sub": username}, expires_delta=access_token_expires
-            )
-            print(access_token)# START HERE
-            token_data = TokenData(username=username)
-        except JWTError:
-            raise credentials_exception
+        raise credentials_exception
     user = get_user(username=token_data.username)
     if user is None:
         raise credentials_exception
