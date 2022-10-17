@@ -140,6 +140,10 @@ class Token(BaseModel):
     token_type: str
 
 
+class RefreshToken(BaseModel):
+    refresh_token: str
+
+
 class TokenData(BaseModel):
     username: str | None = None
 
@@ -195,3 +199,5 @@ class Version(BaseModel):
     language: str
     framework: str
     repository: str
+
+
