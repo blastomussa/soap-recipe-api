@@ -21,25 +21,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-required_cookie_args = {
-        'name':'SOAP_API_COOKIE',
-        'value':'the cookie works'
-    }
-optional_cookie_args = {
-    'version':0,
-    'port':None,
-    'domain':'127.0.0.1', #NOTE: If domain is a blank string or not supplied this creates a "super cookie" that is supplied to all domains.
-    'path':'/',
-    'secure':False,
-    'expires':None,
-    'discard':True,
-    'comment':None,
-    'comment_url':None,
-    'rest':{'HttpOnly': None},
-    'rfc2109':False
-}
-
-
+# requires  headers: { "Content-Type": "multipart/form-data" }
 @router.post("", response_model=Token, status_code=200)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
@@ -58,11 +40,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     refresh_token = create_refresh_token(
         data={"sub": user.username}, expires_delta=refresh_token_expires
     )
-    content = {"access_token": access_token, "token_type":"Bearer"}
+    content = {"access_token": access_token, "token_type":"Bearer", "refresh_token": refresh_token}
     response = JSONResponse(content=content)
+    # not sure if I am going to return cookiee data like this. 
+    # unable to retrieve cookie data via axios in react, may need more testing
     response.set_cookie(key="access_token", value=f"Bearer {access_token}")
     response.set_cookie(key="refresh_token", value=refresh_token)
-    response.set_cookie(key="logged_in", value=1)
+    response.set_cookie(key="logged_in", value=True)
     response.set_cookie(key="username", value=user.username)
     return response
 
