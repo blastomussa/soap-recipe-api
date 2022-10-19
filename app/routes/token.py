@@ -42,12 +42,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     content = {"access_token": access_token, "token_type":"Bearer", "refresh_token": refresh_token}
     response = JSONResponse(content=content)
-    # not sure if I am going to return cookiee data like this. 
-    # unable to retrieve cookie data via axios in react, may need more testing
-    response.set_cookie(key="access_token", value=f"Bearer {access_token}")
-    response.set_cookie(key="refresh_token", value=refresh_token)
-    response.set_cookie(key="logged_in", value=True)
-    response.set_cookie(key="username", value=user.username)
     return response
 
 
@@ -73,10 +67,8 @@ def refresh_token(refresh_token: RefreshToken):
                 refresh = create_refresh_token(
                     data={"sub": username}, expires_delta=refresh_token_expires
                 )
-                content = {"access_token": access_token}
+                content = {"access_token": access_token,"refresh_token": refresh}
                 response = JSONResponse(content=content)
-                response.set_cookie(key="access_token", value=f"Bearer {access_token}")
-                response.set_cookie(key="refresh_token", value=refresh)
                 return response
             else:
                 raise credentials_exception
