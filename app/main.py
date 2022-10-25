@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import Version
 from routes import oils, recipes, token, me, users
 
+# Prometheus metrics instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator
+
 description = """
 Calculates and stores soap recipes
 """
@@ -42,6 +45,11 @@ app.include_router(recipes.router)
 app.include_router(token.router)
 app.include_router(me.router)
 app.include_router(users.router)
+
+# expose /metrics 
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/", response_model=Version, tags=["Version"])
