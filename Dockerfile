@@ -14,3 +14,12 @@ EXPOSE 80
 WORKDIR /API/app
 
 CMD python -m uvicorn main:app --host 0.0.0.0 --port 80
+
+# Docker cmds to test image
+#
+
+# docker buildx build --platform linux/amd64 . #for amd64
+# docker build -t apiimage .
+# docker run -d --name apicontainer -p 80:80 apiimage
+# docker tag myimage blastomussa/soap-recipe-api
+# docker push blastomussa/soap-recipe-api

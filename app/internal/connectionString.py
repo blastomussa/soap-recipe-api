@@ -1,4 +1,3 @@
-from os import getenv
 from config import settings
 
 # Uncomment to connect to local or Atlas MongoDB instance 
