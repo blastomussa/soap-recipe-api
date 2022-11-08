@@ -103,7 +103,7 @@ def test_recipe_endpoints():
     # POST
     response = post(f"{BASE_URL}/recipes", headers=get_auth_header(), json=DATA)
     assert response.status_code == 201
-    
+
     response_json = response.json()
     id = response_json['_id']
 

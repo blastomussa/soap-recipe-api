@@ -24,6 +24,7 @@ def calculateRecipe(Recipe):
         name = r['name']
         w = r['ratio'] * weight
         Recipe['oils'][index]['weight'] = w
+        index = index + 1
         
         # calculate lye weight
         if client.api.oils.find_one({'name': name}): #validate if oil is found in DB
